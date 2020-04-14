@@ -1,0 +1,32 @@
+build:
+  steps:
+    - metadata:
+        name: docker.io/ocibuilder/init
+      tag: 0.1.0
+      stages:
+        - metadata:
+            name: build-image
+          base:
+            image: alpine:3.10.4
+          cmd:
+            - docker:
+                inline:
+                  - RUN mkdir -p /usr/src/app
+                  - WORKDIR /usr/src/app
+                  - COPY dist/init .
+                  - ENTRYPOINT ["init"]
+      context:
+        localContext:
+          contextPath: .
+
+login:
+  - registry: docker.io
+    token: ${E2E_DOCKERHUB_TOKEN}
+    creds:
+      plain:
+        username: ${E2E_DOCKERHUB_USER}
+
+push:
+  - registry: docker.io
+    image: ocibuilder/init
+    tag: 0.1.0
